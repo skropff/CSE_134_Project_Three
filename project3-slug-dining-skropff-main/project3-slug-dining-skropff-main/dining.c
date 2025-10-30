@@ -10,7 +10,7 @@ typedef struct dining {
   int capacity1;
   sem_t semaphore1;
   pthread_mutex_t mutex1;
-  pthred_cond_t cond1;
+  pthread_cond_t cond1;
   bool bool1;
 } dining_t;
 
