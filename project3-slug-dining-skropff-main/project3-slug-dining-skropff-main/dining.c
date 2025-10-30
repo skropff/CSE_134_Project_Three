@@ -1,6 +1,7 @@
 #include "dining.h"
 #include <semaphore.h>
 #include <stdbool.h> 
+#include <stdio.h>
 
 #include <pthread.h>
 #include <stdlib.h>
