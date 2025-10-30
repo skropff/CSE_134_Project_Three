@@ -44,7 +44,7 @@ void dining_student_leave(dining_t *dining) {
   // TODO: Your code goes here
   dining->capacity1 = dining->capacity1 - 1;
   sem_post(&(dining->semaphore1));
-  if (dining->capacity1 == dining->capacity) {
+  if (dining->capacity1 == 0) {
     dining->bool1 = true;
     pthread_cond_signal(&(dining->cond1));
     pthread_mutex_unlock(&(dining->mutex1));
