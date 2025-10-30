@@ -35,6 +35,7 @@ void dining_destroy(dining_t **dining) {
 
 void dining_student_enter(dining_t *dining) {
   // TODO: Your code goes here
+  pthread_mutex_lock(&(dining->mutex1));
   sem_wait(&(dining->semaphore1));
   dining->bool1 = false;
   dining->capacity1 = dining->capacity1 + 1;
