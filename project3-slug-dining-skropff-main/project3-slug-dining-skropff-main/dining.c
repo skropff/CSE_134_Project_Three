@@ -21,8 +21,8 @@ dining_t *dining_init(int capacity) {
   dining->capacity = capacity;
   dining->capacity1 = 0;
   sem_init(&(dining->semaphore1), 0, capacity);
-  pthread_mutex_init(&(dining->mutex1));
-  pthread_cond_init(&(dining->cond1));
+  pthread_mutex_init(&(dining->mutex1), NULL);
+  pthread_cond_init(&(dining->cond1), NULL);
   dining->bool1 = false;
   return dining;
 }
