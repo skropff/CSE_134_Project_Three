@@ -57,7 +57,6 @@ void dining_cleaning_enter(dining_t *dining) {
   while (!(dining->bool1)) {
     pthread_cond_wait(&(dining->cond1), &(dining->mutex1));
   }
-  printf("awake\n");
 }
 
 void dining_cleaning_leave(dining_t *dining) {
