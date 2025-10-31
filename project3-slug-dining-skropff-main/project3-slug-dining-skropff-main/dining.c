@@ -53,10 +53,12 @@ void dining_student_leave(dining_t *dining) {
 
 void dining_cleaning_enter(dining_t *dining) {
   // TODO: Your code goes here
-  pthread_mutex_lock(&(dining->mutex1));
-  while (!(dining->bool1)) {
-    pthread_cond_wait(&(dining->cond1), &(dining->mutex1));
-  }
+  if (!(dining->bool1)) {
+    pthread_mutex_lock(&(dining->mutex1));
+    while (!(dining->bool1)) {
+      pthread_cond_wait(&(dining->cond1), &(dining->mutex1));
+    }
+  }  
 }
 
 void dining_cleaning_leave(dining_t *dining) {
