@@ -11,9 +11,14 @@ typedef struct dining {
   int capacity;
   int capacity1;
   sem_t semaphore1;
+  sem_t semaphore2;
+  sem_t semaphore3;
   pthread_mutex_t mutex1;
   pthread_cond_t cond1;
   bool bool1;
+  pthread_mutex_t mutex2;
+  pthread_cond_t cond2;
+  bool bool2;
 } dining_t;
 
 dining_t *dining_init(int capacity) {
@@ -22,9 +27,13 @@ dining_t *dining_init(int capacity) {
   dining->capacity = capacity;
   dining->capacity1 = 0;
   sem_init(&(dining->semaphore1), 0, capacity);
+  sem_init(&(dining->semaphore1), 0, 1);
   pthread_mutex_init(&(dining->mutex1), NULL);
   pthread_cond_init(&(dining->cond1), NULL);
-  dining->bool1 = false;
+  dining->bool1 = true;
+  pthread_mutex_init(&(dining->mutex2), NULL);
+  pthread_cond_init(&(dining->cond2), NULL);
+  dining->bool2 = true;
   return dining;
 }
 void dining_destroy(dining_t **dining) {
@@ -36,6 +45,10 @@ void dining_destroy(dining_t **dining) {
 void dining_student_enter(dining_t *dining) {
   // TODO: Your code goes here
   sem_wait(&(dining->semaphore1));
+  pthread_mutex_lock(&(dining->mutex2));
+  while (!(dining->bool2)) {
+    pthread_cond_wait(&(dining->cond2), &(dining->mutex2));
+  }
   dining->bool1 = false;
   dining->capacity1 = dining->capacity1 + 1;
 }
@@ -58,10 +71,12 @@ void dining_cleaning_enter(dining_t *dining) {
     while (!(dining->bool1)) {
       pthread_cond_wait(&(dining->cond1), &(dining->mutex1));
     }
-  }  
+  }
+  dining->bool2 = false;
+  pthread_mutex_unlock(&(dining->mutex1));
 }
 
 void dining_cleaning_leave(dining_t *dining) {
   // TODO: Your code goes here
-  pthread_mutex_unlock(&(dining->mutex1));
+  dining->bool2 = true;
 }
