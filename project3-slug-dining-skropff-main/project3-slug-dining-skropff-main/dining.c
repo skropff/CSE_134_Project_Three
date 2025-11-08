@@ -55,10 +55,11 @@ void dining_destroy(dining_t **dining) {
 
 void dining_student_enter(dining_t *dining) {
   // TODO: Your code goes here
-  printf("here\n");
   sem_wait(&(dining->semaphore1));
   pthread_mutex_t personal;
+  printf("here\n");
   pthread_mutex_init(&personal, NULL);
+  printf("here1\n");
   int result;
   result = -1;
   /*
