@@ -126,9 +126,9 @@ void dining_cleaning_enter(dining_t *dining) {
 
 void dining_cleaning_leave(dining_t *dining) {
   // TODO: Your code goes here
+  pthread_cond_broadcast(&(dining->everyone));
   for (int i = 0; i < dining->capacity; i = i + 1) {
     pthread_mutex_unlock(dining->mutex_array + i);
   }
-  pthread_cond_broadcast(&(dining->everyone));
   dining->bool2 = true;
 }
