@@ -21,6 +21,8 @@ typedef struct dining {
   bool bool2;
   pthread_mutex_t *mutex_array;
   pthread_t *id_array;
+  pthread_cond_t everyone;
+  bool cleaning_done;
 } dining_t;
 
 dining_t *dining_init(int capacity) {
@@ -35,6 +37,8 @@ dining_t *dining_init(int capacity) {
   dining->bool1 = true;
   pthread_mutex_init(&(dining->mutex2), NULL);
   pthread_cond_init(&(dining->cond2), NULL);
+  pthread_cond_init(&(dining->everyone), NULL);
+  dining->cleaning_done = true;
   dining->bool2 = true;
   dining->mutex_array = (pthread_mutex_t *) malloc(capacity * sizeof(pthread_mutex_t));
   dining->id_array = (pthread_id *) calloc(capacity, sizeof(pthread_t));
@@ -52,6 +56,8 @@ void dining_destroy(dining_t **dining) {
 void dining_student_enter(dining_t *dining) {
   // TODO: Your code goes here
   sem_wait(&(dining->semaphore1));
+  pthread_mutex_t personal;
+  pthread_mutex_init(&personal, NULL);
   int result;
   result = -1;
   /*
@@ -62,14 +68,22 @@ void dining_student_enter(dining_t *dining) {
   */
   dining->bool1 = false;
   dining->capacity1 = dining->capacity1 + 1;
-  for (int i = 0; i < dining->capacity; i = i + 1) {
-    result = pthread_mutex_trylock(dining->mutex_array + i);
-    if (result == 0) {
-      (dining->id_array)[i] = pthread_self();
-      break;
+  while (result == -1) {
+    for (int i = 0; i < dining->capacity; i = i + 1) {
+      result = pthread_mutex_trylock(dining->mutex_array + i);
+      if (result == 0) {
+        (dining->id_array)[i] = pthread_self();
+        break;
+      }
+    }
+    if (result == -1) {
+      pthread_mutex_lock(&personal);
+      while (!dining->cleaning_done) {   
+        pthread_cond_wait(&(dining->everyone), &personal);
+      }
+      pthread_mutex_unlock(&personal);
     }
   }
-  
 }
 
 void dining_student_leave(dining_t *dining) {
@@ -103,12 +117,17 @@ void dining_cleaning_enter(dining_t *dining) {
   */
   dining->bool2 = false;
   // pthread_mutex_unlock(&(dining->mutex1));
+  dining->cleaning_done = false;
   for (int i = 0; i < dining->capacity; i = i + 1) {
-    pthread_mutex_lock(
+    pthread_mutex_lock(dining->mutex_array + i);
   }
 }
 
 void dining_cleaning_leave(dining_t *dining) {
   // TODO: Your code goes here
+  for (int i = 0; i < dining->capacity; i = i + 1) {
+    pthread_mutex_unlock(dining->mutex_array + i);
+  }
+  pthread_cond_broadcast(&(dining->everyone));
   dining->bool2 = true;
 }
