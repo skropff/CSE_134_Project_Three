@@ -69,32 +69,43 @@ void dining_student_enter(dining_t *dining) {
       break;
     }
   }
-  if (result == -1) {
-    
-  }
+  
 }
 
 void dining_student_leave(dining_t *dining) {
   // TODO: Your code goes here
   dining->capacity1 = dining->capacity1 - 1;
+  for (int i = 0; i < dining->capacity; i = i + 1) {
+    if ((dining->id_array)[i] == pthread_self()) {
+      pthread_mutex_unlock(dining->mutex_array + i);
+      (dining->id_array)[i] = 0;
+    }
+  }
   sem_post(&(dining->semaphore1));
+  /*
   if (dining->capacity1 == 0) {
     dining->bool1 = true;
     pthread_cond_signal(&(dining->cond1));
     pthread_mutex_unlock(&(dining->mutex1));
   }
+  */
 }
 
 void dining_cleaning_enter(dining_t *dining) {
   // TODO: Your code goes here
+  /*
   if (!(dining->bool1)) {
     pthread_mutex_lock(&(dining->mutex1));
     while (!(dining->bool1)) {
       pthread_cond_wait(&(dining->cond1), &(dining->mutex1));
     }
   }
+  */
   dining->bool2 = false;
-  pthread_mutex_unlock(&(dining->mutex1));
+  // pthread_mutex_unlock(&(dining->mutex1));
+  for (int i = 0; i < dining->capacity; i = i + 1) {
+    pthread_mutex_lock(
+  }
 }
 
 void dining_cleaning_leave(dining_t *dining) {
