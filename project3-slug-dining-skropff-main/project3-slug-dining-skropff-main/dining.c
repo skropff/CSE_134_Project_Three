@@ -19,6 +19,8 @@ typedef struct dining {
   pthread_mutex_t mutex2;
   pthread_cond_t cond2;
   bool bool2;
+  pthread_mutex_t *mutex_array;
+  pthread_t *id_array;
 } dining_t;
 
 dining_t *dining_init(int capacity) {
@@ -34,6 +36,11 @@ dining_t *dining_init(int capacity) {
   pthread_mutex_init(&(dining->mutex2), NULL);
   pthread_cond_init(&(dining->cond2), NULL);
   dining->bool2 = true;
+  dining->mutex_array = (pthread_mutex_t *) malloc(capacity * sizeof(pthread_mutex_t));
+  dining->id_array = (pthread_id *) calloc(capacity, sizeof(pthread_t));
+  for (int i = 0; i < capacity; i = i + 1) {
+     pthread_mutex_init(dining->mutex_array + i, NULL);
+  }
   return dining;
 }
 void dining_destroy(dining_t **dining) {
@@ -45,12 +52,26 @@ void dining_destroy(dining_t **dining) {
 void dining_student_enter(dining_t *dining) {
   // TODO: Your code goes here
   sem_wait(&(dining->semaphore1));
+  int result;
+  result = -1;
+  /*
   pthread_mutex_lock(&(dining->mutex2));
   while (!(dining->bool2)) {
     pthread_cond_wait(&(dining->cond2), &(dining->mutex2));
   }
+  */
   dining->bool1 = false;
   dining->capacity1 = dining->capacity1 + 1;
+  for (int i = 0; i < dining->capacity; i = i + 1) {
+    result = pthread_mutex_trylock(dining->mutex_array + i);
+    if (result == 0) {
+      (dining->id_array)[i] = pthread_self();
+      break;
+    }
+  }
+  if (result == -1) {
+    
+  }
 }
 
 void dining_student_leave(dining_t *dining) {
