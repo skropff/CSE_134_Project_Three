@@ -41,7 +41,7 @@ dining_t *dining_init(int capacity) {
   dining->cleaning_done = true;
   dining->bool2 = true;
   dining->mutex_array = (pthread_mutex_t *) malloc(capacity * sizeof(pthread_mutex_t));
-  dining->id_array = (pthread_id *) calloc(capacity, sizeof(pthread_t));
+  dining->id_array = (pthread_t *) calloc(capacity, sizeof(pthread_t));
   for (int i = 0; i < capacity; i = i + 1) {
      pthread_mutex_init(dining->mutex_array + i, NULL);
   }
