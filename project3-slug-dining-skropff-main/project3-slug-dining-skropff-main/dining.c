@@ -23,6 +23,7 @@ typedef struct dining {
   pthread_t *id_array;
   pthread_cond_t everyone;
   bool cleaning_done;
+  pthread_mutex_t throwaway;
 } dining_t;
 
 dining_t *dining_init(int capacity) {
@@ -33,6 +34,7 @@ dining_t *dining_init(int capacity) {
   sem_init(&(dining->semaphore1), 0, capacity);
   // sem_init(&(dining->semaphore1), 0, 1);
   pthread_mutex_init(&(dining->mutex1), NULL);
+  pthread_mutex_init(&(dining->throwaway), NULL);
   pthread_cond_init(&(dining->cond1), NULL);
   dining->bool1 = true;
   pthread_mutex_init(&(dining->mutex2), NULL);
@@ -55,6 +57,7 @@ void dining_destroy(dining_t **dining) {
 
 void dining_student_enter(dining_t *dining) {
   // TODO: Your code goes here
+  pthread_mutex_lock(&(dining->throwaway);
   sem_wait(&(dining->semaphore1));
   pthread_mutex_t personal;
   pthread_mutex_init(&personal, NULL);
@@ -68,15 +71,15 @@ void dining_student_enter(dining_t *dining) {
   */
   dining->bool1 = false;
   dining->capacity1 = dining->capacity1 + 1;
-  while (result == -1) {
-    for (int i = 0; i < dining->capacity; i = i + 1) {
-      result = pthread_mutex_trylock(dining->mutex_array + i);
-      printf("result: %d\n", result);
-      if (result == 0) {
-        (dining->id_array)[i] = pthread_self();
-        break;
-      }
+  for (int i = 0; i < dining->capacity; i = i + 1) {
+    result = pthread_mutex_trylock(dining->mutex_array + i);
+    printf("result: %d\n", result);
+    if (result == 0) {
+      (dining->id_array)[i] = pthread_self();
+      break;
     }
+  }
+  /*
     if (result == -1) {
       pthread_mutex_lock(&personal);
       while (!dining->cleaning_done) {   
@@ -84,7 +87,7 @@ void dining_student_enter(dining_t *dining) {
       }
       pthread_mutex_unlock(&personal);
     }
-  }
+    */
 }
 
 void dining_student_leave(dining_t *dining) {
@@ -116,6 +119,7 @@ void dining_cleaning_enter(dining_t *dining) {
     }
   }
   */
+  pthread_mutex_lock(&(dining->throwaway));
   dining->bool2 = false;
   // pthread_mutex_unlock(&(dining->mutex1));
   dining->cleaning_done = false;
@@ -126,9 +130,9 @@ void dining_cleaning_enter(dining_t *dining) {
 
 void dining_cleaning_leave(dining_t *dining) {
   // TODO: Your code goes here
-  pthread_cond_broadcast(&(dining->everyone));
   for (int i = 0; i < dining->capacity; i = i + 1) {
     pthread_mutex_unlock(dining->mutex_array + i);
   }
+  pthread_mutex_unlock(&(dining->throwaway));
   dining->bool2 = true;
 }
