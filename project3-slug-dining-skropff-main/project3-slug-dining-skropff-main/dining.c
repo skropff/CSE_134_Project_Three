@@ -71,12 +71,18 @@ void dining_student_enter(dining_t *dining) {
   */
   dining->bool1 = false;
   dining->capacity1 = dining->capacity1 + 1;
-  for (int i = 0; i < dining->capacity; i = i + 1) {
-    result = pthread_mutex_trylock(dining->mutex_array + i);
-    printf("result: %d\n", result);
-    if (result == 0) {
-      (dining->id_array)[i] = pthread_self();
-      break;
+  while (result == -1) {
+    for (int i = 0; i < dining->capacity; i = i + 1) {
+      result = pthread_mutex_trylock(dining->mutex_array + i);
+      printf("result: %d\n", result);
+      if (result == 0) {
+        (dining->id_array)[i] = pthread_self();
+        break;
+      }
+    }
+    if (result == -1) {
+      pthread_mutex_lock(&(dining->throwaway));
+      pthread_mutex_unlock(&(dining->throwaway));
     }
   }
   /*
