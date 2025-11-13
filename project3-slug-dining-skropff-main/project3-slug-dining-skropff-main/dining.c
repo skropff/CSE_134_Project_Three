@@ -51,6 +51,8 @@ dining_t *dining_init(int capacity) {
 }
 void dining_destroy(dining_t **dining) {
   // TODO: Free dynamically allocated memory
+  free((*dining)->mutex_array);
+  free((*dining)->id_array);
   free(*dining);
   *dining = NULL;
 }
