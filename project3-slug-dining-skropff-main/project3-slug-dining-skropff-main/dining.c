@@ -82,7 +82,6 @@ void dining_student_enter(dining_t *dining) {
       break;
     }
   }
-  }
   /*
     if (result == -1) {
       pthread_mutex_lock(&personal);
