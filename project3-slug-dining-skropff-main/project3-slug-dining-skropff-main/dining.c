@@ -60,12 +60,12 @@ void dining_destroy(dining_t **dining) {
 void dining_student_enter(dining_t *dining) {
   // TODO: Your code goes here
   sem_wait(&(dining->semaphore1));
+  pthread_mutex_lock(&(dining->throwaway));
+  pthread_mutex_unlock(&(dining->throwaway));
   pthread_mutex_t personal;
   pthread_mutex_init(&personal, NULL);
   int result;
   result = -1;
-  pthread_mutex_lock(&(dining->throwaway));
-  pthread_mutex_unlock(&(dining->throwaway));
   /*
   pthread_mutex_lock(&(dining->mutex2));
   while (!(dining->bool2)) {
