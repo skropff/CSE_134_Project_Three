@@ -1,6 +1,6 @@
 #include "dining.h"
 #include <semaphore.h>
-#include <stdbool.h> 
+#include <stdbool.h>
 #include <stdio.h>
 
 #include <pthread.h>
@@ -42,10 +42,11 @@ dining_t *dining_init(int capacity) {
   pthread_cond_init(&(dining->everyone), NULL);
   dining->cleaning_done = true;
   dining->bool2 = true;
-  dining->mutex_array = (pthread_mutex_t *) malloc(capacity * sizeof(pthread_mutex_t));
-  dining->id_array = (pthread_t *) calloc(capacity, sizeof(pthread_t));
+  dining->mutex_array =
+      (pthread_mutex_t *)malloc(capacity * sizeof(pthread_mutex_t));
+  dining->id_array = (pthread_t *)calloc(capacity, sizeof(pthread_t));
   for (int i = 0; i < capacity; i = i + 1) {
-     pthread_mutex_init(dining->mutex_array + i, NULL);
+    pthread_mutex_init(dining->mutex_array + i, NULL);
   }
   return dining;
 }
@@ -76,7 +77,7 @@ void dining_student_enter(dining_t *dining) {
   dining->capacity1 = dining->capacity1 + 1;
   for (int i = 0; i < dining->capacity; i = i + 1) {
     result = pthread_mutex_trylock(dining->mutex_array + i);
-      // printf("result: %d\n", result);
+    // printf("result: %d\n", result);
     if (result == 0) {
       (dining->id_array)[i] = pthread_self();
       break;
@@ -85,7 +86,7 @@ void dining_student_enter(dining_t *dining) {
   /*
     if (result == -1) {
       pthread_mutex_lock(&personal);
-      while (!dining->cleaning_done) {   
+      while (!dining->cleaning_done) {
         pthread_cond_wait(&(dining->everyone), &personal);
       }
       pthread_mutex_unlock(&personal);
